@@ -1,5 +1,6 @@
 import glob
 import os
+import random
 import re
 import time
 from collections import defaultdict
@@ -24,6 +25,7 @@ class LmdbDataExporter(object):
                  output_path=None,
                  dir_level=5,
                  class_level=2,
+                 train_ratio=0.8,
                  shape=(256, 256),
                  batch_size=100):
         """
@@ -34,9 +36,12 @@ class LmdbDataExporter(object):
         self.output_path = output_path
         self.dir_level = dir_level
         self.class_level = class_level
+        self.train_ratio = train_ratio
         self.shape = shape
         self.batch_size = batch_size
         self.label_list = list()
+        self.train_idx = 0
+        self.val_idx = 0
 
         if not os.path.exists(img_dir):
             raise Exception(f'{img_dir} is not exists!')
@@ -44,58 +49,105 @@ class LmdbDataExporter(object):
         if not os.path.exists(output_path):
             os.makedirs(output_path)
 
+        train_output_path = os.path.join(output_path, 'train.lmdb')
+        val_output_path = os.path.join(output_path, 'val.lmdb')
+        if not os.path.exists(train_output_path):
+            os.makedirs(train_output_path)
+        if not os.path.exists(val_output_path):
+            os.makedirs(val_output_path)
+
         # 最大10T
-        self.lmdb_env = lmdb.open(output_path, map_size=_10TB, max_dbs=4)
+        self.train_lmdb_env = lmdb.open(
+            train_output_path, map_size=_10TB, max_dbs=4)
+        self.val_lmdb_env = lmdb.open(
+            val_output_path, map_size=_10TB, max_dbs=4)
 
         self.label_dict = defaultdict(int)
 
+    def persist_2_database(self, items, item_img, results, st, is_train):
+        if len(items) < self.batch_size:
+            if is_train:
+                self.train_idx += 1
+            else:
+                self.val_idx += 1
+
+            items.append(item_img)
+            return st, items, results
+
+        with ThreadPoolExecutor() as executor:
+            results.extend(executor.map(self._extract_once, items))
+            del items[:]
+
+        if len(results) >= self.batch_size:
+            self.save_to_lmdb(results, is_train)
+            et = time.time()
+            if is_train:
+                logger.info(
+                    f'time: {(et-st)}(s) training count: {self.train_idx}')
+            else:
+                logger.info(f'time: {(et-st)}(s) val count: {self.val_idx}')
+            st = time.time()
+            del results[:]
+
+        return st, items, results
+
     def export(self):
-        idx = 0
-        results = []
+        train_results = []
+        val_results = []
         st = time.time()
         iter_img_lst = self.read_imgs()
-        while True:
-            items = []
-            try:
-                while len(items) < self.batch_size:
-                    items.append(next(iter_img_lst))
-            except StopIteration:
-                break
+        train_items, val_items = [], []
+        for item_img in iter_img_lst:
+            if random.random() <= self.train_ratio:
+                st, train_items, train_results = self.persist_2_database(
+                    train_items, item_img, train_results, st, is_train=True)
+            else:
+                st, val_items, val_results = self.persist_2_database(
+                    val_items, item_img, val_results, st, is_train=False)
 
-            with ThreadPoolExecutor() as executor:
-                results.extend(executor.map(self._extract_once, items))
+        with ThreadPoolExecutor() as executor:
+            train_results.extend(executor.map(self._extract_once, train_items))
+            val_results.extend(executor.map(self._extract_once, val_items))
+            del train_items[:], val_items[:]
 
-            if len(results) >= self.batch_size:
-                self.save_to_lmdb(results)
-                idx += self.batch_size
-                et = time.time()
-                logger.info(f'time: {(et-st)}(s)  count: {idx}')
-                st = time.time()
-                del results[:]
+        self.save_to_lmdb(train_results, is_train=True)
+        self.save_to_lmdb(val_results, is_train=False)
+
+        self.save_total()
+        del train_results[:]
+        del val_results[:]
 
         et = time.time()
-        logger.info(f'time: {(et-st)}(s)  count: {idx}')
-        self.save_to_lmdb(results)
-        self.save_total(idx)
-        del results[:]
+        logger.info(f'time: {(et-st)}(s)  count: {self.train_idx}')
+        logger.info(f'time: {(et-st)}(s)  count: {self.val_idx}')
 
-    def save_to_lmdb(self, results):
+    def save_to_lmdb(self, results, is_train):
         """
         persist to lmdb
         """
-        with self.lmdb_env.begin(write=True) as txn:
-            while results:
-                img_key, img_byte = results.pop()
-                if img_key is None or img_byte is None:
-                    continue
-                txn.put(img_key, img_byte)
+        if is_train:
+            with self.train_lmdb_env.begin(write=True) as txn:
+                while results:
+                    img_key, img_byte = results.pop()
+                    if img_key is None or img_byte is None:
+                        continue
+                    txn.put(img_key, img_byte)
+        else:
+            with self.val_lmdb_env.begin(write=True) as txn:
+                while results:
+                    img_key, img_byte = results.pop()
+                    if img_key is None or img_byte is None:
+                        continue
+                    txn.put(img_key, img_byte)
 
-    def save_total(self, total: int):
+    def save_total(self):
         """
         persist all numbers of imgs
         """
-        with self.lmdb_env.begin(write=True, buffers=True) as txn:
-            txn.put('total'.encode(), str(total).encode())
+        with self.train_lmdb_env.begin(write=True, buffers=True) as txn:
+            txn.put('total'.encode(), str(self.train_idx).encode())
+        with self.val_lmdb_env.begin(write=True, buffers=True) as txn:
+            txn.put('total'.encode(), str(self.val_idx).encode())
 
     def _extract_once(self, item) -> Tuple[bytes, bytes]:
         full_path = item[-1]

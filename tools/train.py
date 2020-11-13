@@ -18,10 +18,7 @@ from mmcls.utils import collect_env, get_root_logger
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a model')
-    parser.add_argument(
-        '--config',
-        default='configs/imagenet/resnest101_b32x8_lmdb.py',
-        help='train config file path')
+    parser.add_argument('config', help='train config file path')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument(
         '--resume-from', help='the checkpoint file to resume from')

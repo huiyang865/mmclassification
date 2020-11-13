@@ -46,7 +46,7 @@ data = dict(
         dataset=dict(
             type=dataset_type,
             data_prefix='',
-            ann_file='data/lmdb/train.lmdb',
+            ann_file='data/lmdb/val.lmdb',
             pipeline=train_pipeline)),
     test=dict(
         type='ClassBalancedDataset',
@@ -54,6 +54,6 @@ data = dict(
         dataset=dict(
             type=dataset_type,
             data_prefix='',
-            ann_file='data/lmdb/train.lmdb',
+            ann_file='data/lmdb/val.lmdb',
             pipeline=train_pipeline)))
 evaluation = dict(interval=1, metric='accuracy')

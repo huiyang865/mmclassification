@@ -23,6 +23,10 @@ def parse_args():
         default=2,
         help='the level number for the class directory')
     parser.add_argument(
+        '--train_ratio',
+        default=0.9,
+        help='the level number for the class directory')
+    parser.add_argument(
         '--shape',
         default=(256, 256),
         help='reshaping size of imgs before saving')
@@ -44,6 +48,7 @@ def main():
         args.output_path,
         dir_level=args.dir_level,
         class_level=args.class_level,
+        train_ratio=args.train_ratio,
         shape=args.shape,
         batch_size=args.batch_size)
 
@@ -56,7 +61,9 @@ def main():
         ]})
 
     exporter.export()
-    print(f'class num is: {len(exporter.label_list)}')
+    logger.info(f'class num is: {len(exporter.label_list)}')
+    logger.info(f'training img num is: {exporter.train_idx}')
+    logger.info(f'val img num is: {exporter.val_idx}')
 
 
 if __name__ == '__main__':
