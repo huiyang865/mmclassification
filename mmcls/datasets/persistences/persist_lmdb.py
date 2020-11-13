@@ -27,7 +27,8 @@ class LmdbDataExporter(object):
                  class_level=2,
                  train_ratio=0.8,
                  shape=(256, 256),
-                 batch_size=100):
+                 batch_size=100,
+                 target_dir_name=''):
         """
             img_dir: imgs directory
             output_path: LMDB output path
@@ -42,6 +43,7 @@ class LmdbDataExporter(object):
         self.label_list = list()
         self.train_idx = 0
         self.val_idx = 0
+        self.target_dir_name = target_dir_name
 
         if not os.path.exists(img_dir):
             raise Exception(f'{img_dir} is not exists!')
@@ -98,12 +100,13 @@ class LmdbDataExporter(object):
         iter_img_lst = self.read_imgs()
         train_items, val_items = [], []
         for item_img in iter_img_lst:
-            if random.random() <= self.train_ratio:
-                st, train_items, train_results = self.persist_2_database(
-                    train_items, item_img, train_results, st, is_train=True)
-            else:
+            if random.random(
+            ) > self.train_ratio and self.target_dir_name in item_img[-1]:
                 st, val_items, val_results = self.persist_2_database(
                     val_items, item_img, val_results, st, is_train=False)
+            else:
+                st, train_items, train_results = self.persist_2_database(
+                    train_items, item_img, train_results, st, is_train=True)
 
         with ThreadPoolExecutor() as executor:
             train_results.extend(executor.map(self._extract_once, train_items))

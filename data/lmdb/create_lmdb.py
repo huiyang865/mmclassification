@@ -14,6 +14,11 @@ def parse_args():
     parser.add_argument(
         '--output_path', type=str, required=True, help='output path of LMDB')
     parser.add_argument(
+        '--target_dir_name',
+        default='',
+        help='the hierarchy number of input_dir which contains the image files'
+    )
+    parser.add_argument(
         '--dir_level',
         default=5,
         help='the hierarchy number of input_dir which contains the image files'
@@ -50,7 +55,8 @@ def main():
         class_level=args.class_level,
         train_ratio=args.train_ratio,
         shape=args.shape,
-        batch_size=args.batch_size)
+        batch_size=args.batch_size,
+        target_dir_name=args.target_dir_name)
 
     logger.configure(
         **{'handlers': [
