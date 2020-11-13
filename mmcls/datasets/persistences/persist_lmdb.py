@@ -22,6 +22,8 @@ class LmdbDataExporter(object):
     def __init__(self,
                  img_dir=None,
                  output_path=None,
+                 dir_level=5,
+                 class_level=2,
                  shape=(256, 256),
                  batch_size=100):
         """
@@ -30,6 +32,8 @@ class LmdbDataExporter(object):
         """
         self.img_dir = img_dir
         self.output_path = output_path
+        self.dir_level = dir_level
+        self.class_level = class_level
         self.shape = shape
         self.batch_size = batch_size
         self.label_list = list()
@@ -130,10 +134,22 @@ class LmdbDataExporter(object):
         return rimg
 
     def read_imgs(self):
-        img_list = glob.glob(os.path.join(self.img_dir, '*/*.jpg'))
+        img_list, dir_level = [], ''
+        for i in range(self.dir_level):
+            dir_level += '*/'
+            for img_postfix in ['jpg', 'png', 'JPEG']:
+                img_list.extend(
+                    glob.glob(
+                        os.path.join(self.img_dir,
+                                     f'{dir_level}*.{img_postfix}')))
 
         for idx, item_img in enumerate(img_list):
-            label = item_img.split('/')[-2]
+            if self.img_dir.endswith('/'):
+                self.img_dir = self.img_dir[:-1]
+
+            label = item_img.replace(self.img_dir,
+                                     '').split('/')[self.class_level]
+
             if label not in self.label_list:
                 self.label_list.append(label)
 

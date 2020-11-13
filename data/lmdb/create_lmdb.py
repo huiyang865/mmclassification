@@ -14,6 +14,15 @@ def parse_args():
     parser.add_argument(
         '--output_path', type=str, required=True, help='output path of LMDB')
     parser.add_argument(
+        '--dir_level',
+        default=5,
+        help='the hierarchy number of input_dir which contains the image files'
+    )
+    parser.add_argument(
+        '--class_level',
+        default=2,
+        help='the level number for the class directory')
+    parser.add_argument(
         '--shape',
         default=(256, 256),
         help='reshaping size of imgs before saving')
@@ -33,6 +42,8 @@ def main():
     exporter = LmdbDataExporter(
         args.input_dir,
         args.output_path,
+        dir_level=args.dir_level,
+        class_level=args.class_level,
         shape=args.shape,
         batch_size=args.batch_size)
 
@@ -45,6 +56,7 @@ def main():
         ]})
 
     exporter.export()
+    print(f'class num is: {len(exporter.label_list)}')
 
 
 if __name__ == '__main__':
