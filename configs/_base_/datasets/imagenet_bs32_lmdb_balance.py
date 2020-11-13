@@ -33,22 +33,27 @@ data = dict(
     samples_per_gpu=32,
     workers_per_gpu=4,
     train=dict(
-        type=dataset_type,
-        data_prefix='',
-        ann_file='data/lmdb/train.lmdb',
-        pipeline=train_pipeline),
+        type='ClassBalancedDataset',
+        oversample_thr=1e-3,
+        dataset=dict(
+            type=dataset_type,
+            data_prefix='',
+            ann_file='data/lmdb/train.lmdb',
+            pipeline=train_pipeline)),
     val=dict(
-        type=dataset_type,
-        data_prefix='',
-        # replace `data/lmdb/train.lmdb`
-        # with `data/lmdb/val.lmdb` for standard test
-        ann_file='data/lmdb/train.lmdb',
-        pipeline=test_pipeline),
+        type='ClassBalancedDataset',
+        oversample_thr=1e-3,
+        dataset=dict(
+            type=dataset_type,
+            data_prefix='',
+            ann_file='data/lmdb/train.lmdb',
+            pipeline=train_pipeline)),
     test=dict(
-        type=dataset_type,
-        data_prefix='',
-        # replace `data/lmdb/train.lmdb`
-        # with `data/lmdb/test.lmdb` for standard test
-        ann_file='data/lmdb/train.lmdb',
-        pipeline=test_pipeline))
+        type='ClassBalancedDataset',
+        oversample_thr=1e-3,
+        dataset=dict(
+            type=dataset_type,
+            data_prefix='',
+            ann_file='data/lmdb/train.lmdb',
+            pipeline=train_pipeline)))
 evaluation = dict(interval=1, metric='accuracy')

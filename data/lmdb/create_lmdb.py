@@ -10,16 +10,17 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='Making LMDB database with multiprocess')
     parser.add_argument(
-        '--input_dir', required=True, help='the input dir of imgs')
+        '--input_dir', type=str, required=True, help='the input dir of imgs')
     parser.add_argument(
-        '--output_path', required=True, help='output path of LMDB')
+        '--output_path', type=str, required=True, help='output path of LMDB')
     parser.add_argument(
         '--shape',
         default=(256, 256),
         help='reshaping size of imgs before saving')
     parser.add_argument(
         '--batch_size',
-        default=100,
+        type=int,
+        default=1000,
         help='batch size of each process to save imgs')
 
     args = parser.parse_args()

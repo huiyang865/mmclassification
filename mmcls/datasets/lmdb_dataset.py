@@ -30,6 +30,18 @@ class LMDBDataset(BaseDataset):
             })
         return data_infos
 
+    def get_cat_ids(self, idx):
+        """Get category id by index.
+
+        Args:
+            idx (int): Index of data.
+
+        Returns:
+            int: Image category of specified index.
+        """
+
+        return [int(self.data_infos[idx]['gt_label'])]
+
     def load_annotations(self):
         assert isinstance(self.ann_file, str)
 
