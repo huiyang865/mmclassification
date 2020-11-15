@@ -52,7 +52,7 @@ class LmdbDataExporter(object):
             os.makedirs(output_path)
 
         train_output_path = os.path.join(output_path, 'train.lmdb')
-        val_output_path = os.path.join(output_path, 'val.lmdb')
+        val_output_path = os.path.join(output_path, 'trainval.lmdb')
         if not os.path.exists(train_output_path):
             os.makedirs(train_output_path)
         if not os.path.exists(val_output_path):
@@ -102,9 +102,11 @@ class LmdbDataExporter(object):
         for item_img in iter_img_lst:
             if random.random(
             ) > self.train_ratio and self.target_dir_name in item_img[-1]:
+                item_img[0] = self.val_idx
                 st, val_items, val_results = self.persist_2_database(
                     val_items, item_img, val_results, st, is_train=False)
             else:
+                item_img[0] = self.train_idx
                 st, train_items, train_results = self.persist_2_database(
                     train_items, item_img, train_results, st, is_train=True)
 
@@ -208,5 +210,5 @@ class LmdbDataExporter(object):
             if label not in self.label_list:
                 self.label_list.append(label)
 
-            item = (idx, self.label_list.index(label), item_img)
+            item = [idx, self.label_list.index(label), item_img]
             yield item

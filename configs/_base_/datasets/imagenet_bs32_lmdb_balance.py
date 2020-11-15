@@ -45,13 +45,13 @@ data = dict(
         data_prefix='',
         # replace `data/lmdb/train.lmdb`
         # with `data/lmdb/val.lmdb` for standard test
-        ann_file='data/lmdb/train.lmdb',
+        ann_file='data/lmdb/trainval.lmdb',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
         data_prefix='',
         # replace `data/lmdb/train.lmdb`
         # with `data/lmdb/test.lmdb` for standard test
-        ann_file='data/lmdb/train.lmdb',
+        ann_file='data/lmdb/trainval.lmdb',
         pipeline=test_pipeline))
 evaluation = dict(interval=1, metric='accuracy')
