@@ -10,12 +10,18 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='Making LMDB database with multiprocess')
     parser.add_argument(
-        '--input_dir', type=str, required=True, help='the input dir of imgs')
+        '--input_dir',
+        type=str,
+        default='/home/yanghui/yanghui/openset_v2/dataset/train_data',
+        help='the input dir of imgs')
     parser.add_argument(
-        '--output_path', type=str, required=True, help='output path of LMDB')
+        '--output_path',
+        type=str,
+        default='/home/yanghui/yanghui/open_git/mmclassification/data/lmdb',
+        help='output path of LMDB')
     parser.add_argument(
         '--target_dir_name',
-        default='',
+        default='other1',
         help='the hierarchy number of input_dir which contains the image files'
     )
     parser.add_argument(
