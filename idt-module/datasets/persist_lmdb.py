@@ -38,7 +38,7 @@ class LmdbDataExporter(object):
 
         self.label_dict = defaultdict(int)
 
-    def persist_2_database(self, items, item_img, results, st, is_train):
+    def persist_2_database(self, items, item_img, results, st):
         if len(items) < self.batch_size:
             self.idx += 1
 
@@ -50,12 +50,10 @@ class LmdbDataExporter(object):
             del items[:]
 
         if len(results) >= self.batch_size:
-            self.save_to_lmdb(results, is_train)
+            self.save_to_lmdb(results)
             et = time.time()
-            if is_train:
-                logger.info(f'time: {(et-st)}(s) training count: {self.idx}')
-            else:
-                logger.info(f'time: {(et-st)}(s) val count: {self.idx}')
+            logger.info('time: {}(s) training count: {}'.format((et - st),
+                                                                self.idx))
             st = time.time()
             del results[:]
 
@@ -68,7 +66,7 @@ class LmdbDataExporter(object):
         for item_img in iter_img_lst:
             item_img[0] = self.idx
             st, items, results = self.persist_2_database(
-                items, item_img, results, st, is_train=True)
+                items, item_img, results, st)
 
         with ThreadPoolExecutor() as executor:
             results.extend(executor.map(self._extract_once, items))
@@ -80,7 +78,7 @@ class LmdbDataExporter(object):
         del results[:]
 
         et = time.time()
-        logger.info(f'time: {(et-st)}(s)  count: {self.idx}')
+        logger.info('time: {}(s)  count: {}'.format((et - st), self.idx))
 
     def save_to_lmdb(self, results):
         """
@@ -106,7 +104,7 @@ class LmdbDataExporter(object):
 
         img = cv2.imread(full_path)
         if img is None:
-            logger.error(f'{full_path} is a bad img file.')
+            logger.error('{} is a bad img file.'.format(full_path))
             return None, None
         if img.shape != self.shape:
             img = self.fillImg(img)

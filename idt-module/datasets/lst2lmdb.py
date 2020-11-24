@@ -45,9 +45,8 @@ def main():
         ]})
 
     exporter.export()
-    logger.info(f'class num is: {len(exporter.label_list)}')
-    logger.info(f'training img num is: {exporter.train_idx}')
-    logger.info(f'val img num is: {exporter.val_idx}')
+    logger.info('class num is: {}'.format(len(exporter.label_list)))
+    logger.info('img num is: {}'.format(exporter.idx))
 
 
 if __name__ == '__main__':
