@@ -1,9 +1,8 @@
 import argparse
 import sys
 
+from datasets.persist_lmdb import LmdbDataExporter
 from loguru import logger
-
-from .persist_lmdb import LmdbDataExporter
 
 
 def parse_args():
