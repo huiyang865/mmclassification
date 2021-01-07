@@ -1,8 +1,7 @@
-import os
-import sys
-
 import lmdb
 import mmcv
+import os
+import sys
 from loguru import logger
 
 from mmcls.datasets.persistences.persist_lmdb import LmdbDataExporter

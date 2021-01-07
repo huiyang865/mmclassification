@@ -1,6 +1,6 @@
-import torch.nn as nn
 from mmcv.cnn import ConvModule, constant_init, kaiming_init, normal_init
 from mmcv.utils.parrots_wrapper import _BatchNorm
+from torch import nn as nn
 
 from ..builder import BACKBONES
 from .base_backbone import BaseBackbone

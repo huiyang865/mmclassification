@@ -1,9 +1,8 @@
-import warnings
-
-import matplotlib.pyplot as plt
 import mmcv
 import numpy as np
 import torch
+import warnings
+from matplotlib import pyplot as plt
 from mmcv.parallel import collate, scatter
 from mmcv.runner import load_checkpoint
 

@@ -1,13 +1,12 @@
 import logging
-import tempfile
-from unittest.mock import MagicMock, patch
-
 import mmcv.runner
 import pytest
+import tempfile
 import torch
-import torch.nn as nn
 from mmcv.runner import obj_from_dict
+from torch import nn as nn
 from torch.utils.data import DataLoader, Dataset
+from unittest.mock import MagicMock, patch
 
 from mmcls.apis import single_gpu_test
 from mmcls.core import DistEvalHook, EvalHook

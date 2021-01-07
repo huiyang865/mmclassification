@@ -1,8 +1,7 @@
 import argparse
 import os
-from collections import OrderedDict
-
 import torch
+from collections import OrderedDict
 
 
 def get_layer_maps(layer_num, with_bn):

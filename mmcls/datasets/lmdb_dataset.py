@@ -1,8 +1,7 @@
 import glob
-import os
-
 import lmdb
 import numpy as np
+import os
 
 from .base_dataset import BaseDataset
 from .builder import DATASETS

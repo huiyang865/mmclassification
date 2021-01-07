@@ -1,7 +1,7 @@
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
 from mmcv.cnn import normal_init
+from torch import nn as nn
+from torch.nn import functional as F
 
 from ..builder import HEADS
 from .cls_head import ClsHead

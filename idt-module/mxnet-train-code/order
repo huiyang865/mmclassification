@@ -1,0 +1,1 @@
+python fine-tune.py --model-prefix model/densenet161/densenet-161 --pretrained-model model/densenet-161 --load-epoch 0 --gpus 0,1 --random-mirror 1 --max-random-rotate-angle 10 --pca-noise 0.3

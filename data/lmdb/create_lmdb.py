@@ -1,6 +1,5 @@
 import argparse
 import sys
-
 from loguru import logger
 
 from mmcls.datasets.persistences.persist_lmdb import LmdbDataExporter

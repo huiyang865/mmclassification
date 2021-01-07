@@ -1,12 +1,11 @@
+import cv2
+import lmdb
 import re
 import time
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from typing import Tuple
-
-import cv2
-import lmdb
 from loguru import logger
+from typing import Tuple
 
 _10TB = 10 * (1 << 40)
 

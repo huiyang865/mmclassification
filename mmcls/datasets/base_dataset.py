@@ -1,8 +1,7 @@
 import copy
-from abc import ABCMeta, abstractmethod
-
 import mmcv
 import numpy as np
+from abc import ABCMeta, abstractmethod
 from torch.utils.data import Dataset
 
 from mmcls.models.losses import accuracy

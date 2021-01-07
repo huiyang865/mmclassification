@@ -106,12 +106,15 @@ venv.bak/
 
 # custom
 .vscode
+.history
 .idea
 *.pkl
 *.pkl.json
 *.log.json
 work_dirs/
 archive/
+logs/
+models/
 
 # Pytorch
 *.pth
